@@ -1,0 +1,94 @@
+#header #burger{display:none; position:absolute; top:55px; right:15px; width:32px; height:32px; cursor:pointer; background:url(../../img/burger.png) center center no-repeat; background-size:cover; z-index:100;}
+@media all and (max-width:1199px){
+
+}
+@media all and (max-width:979px){
+    .container {width:710px !important;}
+    #header #nav li a { font-size: 15px; padding: 20px 11px; }
+    .gallery-slider-wrapper { display: block; width: 95%; margin-left: auto; margin-right: auto;}
+    .page-51 .contact-form { width:60%;}
+    .page-51 .page-content {width:40%;}
+    .page-78 .contact-form { width:60%;}
+    .page-78 .page-content {width:40%;}
+    .page-69 .contact-form { width:60%;}
+    .page-69 .page-content {width:40%;}
+    .page-53 table {width:100%; float:none;}
+    .page-53 table+table tr td:first-child {padding-left:0px;}
+    .page-79 table {width:100%; float:none;}
+    .page-79 table+table tr td:first-child {padding-left:0px;}
+    .page-74 table {width:100%; float:none;}
+    .page-74 table+table tr td:first-child {padding-left:0px;}
+
+    .news.row .col-md-3 {float:left; position:relative; z-index:10;}
+    .bx-wrapper img {height:auto !important;}
+    #header { z-index: 999;}
+    html.de #header #nav li a {padding:20px 10px;}
+}
+@media all and (max-width:767px){
+    .container {width:540px !important;}
+    .small_boxes_img{text-align:center;}
+    .home #content_97, .home #content_96 {width:100%; float:none; padding-left:0px;}
+    .home #content_112, .home #content_122 {width:100%; float:none; padding-left:0px;}
+    .home #content_121, .home #content_104 {width:100%; float:none; padding-left:0px;}
+    #header #burger{display:block;}
+    #header #nav {display:none; position:absolute; right:0px; background:white;z-index: 999; background: #fafafa;}
+    #header #nav li {display:block;}
+    #header #nav > ul > li ul {position:relative;}
+    #header #nav > ul > li:hover ul {transform: none;  background: whitesmoke; margin:0px;}
+    #header #nav li a { padding: 15px 30px;  display: block; min-width: 190px;}
+    #footer #copyright {text-align:center;padding:5px 15px;}
+    #footer #realization {text-align:center;padding:5px 15px;}
+    #footer li { width: 33.33%;  float: left;  text-align: center; height: 40px;}
+    #footer ul {display:inline-block;}
+    #header #logo {margin-bottom:10px;}
+    .page-51 .contact-form { width:100%;}
+    .page-51 .page-content {width:100%;}
+    .page-78 .contact-form { width:100%;}
+    .page-78 .page-content {width:100%;}
+    .page-69 .contact-form { width:100%;}
+    .page-69 .page-content {width:100%;}
+
+
+    #reservation-form .half-form .form-input {width:60%;}
+
+
+    /* prettyPhoto styling for small screens */
+    /* Mobile Portrait Size to Mobile Landscape Size (devices and browsers) */
+
+    .pp_pic_holder.pp_default { width: 100%!important; left: 0!important; overflow: hidden; }
+    div.pp_default .pp_content_container .pp_left { padding-left: 0!important; }
+    div.pp_default .pp_content_container .pp_right { padding-right: 0!important; }
+    .pp_content { width: 100%!important; height: auto!important; }
+    .pp_fade { width: 100%!important; height: 100%!important; }
+    a.pp_expand, a.pp_contract, .pp_hoverContainer, .pp_gallery, .pp_top, .pp_bottom { display: none!important; }
+    #pp_full_res img { width: 100%!important; height: auto!important; }
+    .pp_details { width: 100% !important; padding-left: 3%; padding-right: 4%; padding-top: 20px; padding-bottom: 20px; background-color: #fff; margin-top: -2px!important; }
+    a.pp_close { right: 10px!important; top: 10px!important; }
+
+
+}
+@media all and (max-width:570px){
+    .container {width:100% !important;}
+    .news.row .col-md-3 {width:100%; float:none; text-align:center;}
+}
+@media all and (max-width:479px){
+
+    #header #topslider {display:none;}
+    .small_boxes_img img {height: 150px;}
+    .gallery-slider-wrapper {display:none;}
+
+
+    .page-76 table tr td{ width:50%;}
+    .page-67 table tr td{ width:50%;}
+    .page56 table tr td{ width:50%;}
+    #reservation-form label {width:100%;}
+    #reservation-form .half-form .form-input {width:100%;}
+    #reservation-form .form-input {width:100%;}
+    #reservation-form textarea {width:100%;}
+
+
+.page-53 table td {    padding: 0px 10px;}
+.page-79 table td {    padding: 0px 10px;}
+.page-64 table td {    padding: 0px 10px;}
+
+}

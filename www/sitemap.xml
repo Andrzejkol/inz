@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- sitemap-generator-url="http://www.auditmypc.com/free-sitemap-generator.asp" -->
+<!-- This sitemap was created using the free tool found here: http://www.auditmypc.com/free-sitemap-generator.asp -->
+<!-- Audit My PC also offers free security tools to help keep you safe during internet travels -->
+<urlset 
+		xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 
+		http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd"
+>
+<url>
+    <loc>http://dogthelux.com/</loc>
+</url>
+<url>
+    <loc>http://dogthelux.com/o-firmie</loc>
+</url>
+<url>
+    <loc>http://dogthelux.com/sklep</loc>
+</url>
+<url>
+    <loc>http://dogthelux.com/realizacje</loc>
+</url>
+<url>
+    <loc>http://dogthelux.com/kontakt</loc>
+</url>
+<url>
+    <loc>http://dogthelux.com/polityka-prywatnosci</loc>
+</url>
+<url>
+    <loc>http://dogthelux.com/sposoby-i-koszty-dostawy</loc>
+</url>
+<url>
+    <loc>http://dogthelux.com/czas-realizacji</loc>
+</url>
+<url>
+    <loc>http://dogthelux.com/formy-platnosci</loc>
+</url>
+<url>
+    <loc>http://dogthelux.com/reklamacje-i-zwroty</loc>
+</url>
+<url>
+    <loc>http://dogthelux.com/produkt/96/small-1</loc>
+</url>
+<url>
+    <loc>http://dogthelux.com/produkt/99/small-2</loc>
+</url>
+<url>
+    <loc>http://dogthelux.com/produkt/100/small-3</loc>
+</url>
+<url>
+    <loc>http://dogthelux.com/produkt/97/medium-1</loc>
+</url>
+<url>
+    <loc>http://dogthelux.com/produkt/98/big-1</loc>
+</url>
+</urlset>

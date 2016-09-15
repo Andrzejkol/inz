@@ -1,0 +1,31 @@
+<div class="row footer-links">
+    <div class="col-md-11">
+        <ul>
+            <li><?php echo html::anchor(Kohana::lang('links.lang').Kohana::lang('app.glowna-l') ,Kohana::lang('app.glowna')); ?></li>
+            <li><?php echo html::anchor(Kohana::lang('links.lang').Kohana::lang('app.pokoje-l') ,Kohana::lang('app.pokoje')); ?></li>
+            <li><?php echo html::anchor(Kohana::lang('links.lang').Kohana::lang('app.klubowa-l') ,Kohana::lang('app.klubowa')); ?></li>
+            <li><?php echo html::anchor(Kohana::lang('links.lang').Kohana::lang('app.cennik-l') ,Kohana::lang('app.cennik')); ?></li>
+            <li><?php echo html::anchor('http://www.jas.pl/commhotel/restauracja/', Kohana::lang('app.restauracja')); ?></li>
+            <li><?php echo html::anchor(Kohana::lang('links.lang').Kohana::lang('app.ogrod-l') ,Kohana::lang('app.ogrod')); ?></li>
+            <li><?php echo html::anchor(Kohana::lang('links.lang').Kohana::lang('app.rezerwacje-l') ,Kohana::lang('app.rezerwacje')); ?></li>
+            <li><?php echo html::anchor(Kohana::lang('links.lang').Kohana::lang('app.promocje-l') ,Kohana::lang('app.promocje')); ?></li>
+            <li><?php echo html::anchor(Kohana::lang('links.lang').Kohana::lang('app.kontakt-l') ,Kohana::lang('app.kontakt')); ?></li>
+        </ul>
+    </div>
+    <div class="col-md-1 text-right">
+      <?php echo html::anchor('https://www.facebook.com/pages/Hotel-Comm-Hotel/141582892575079', html::image('img/comm/fb.jpg')); ?>
+    </div>
+</div>
+<div class="row">
+    <div id="copyright" class="col-sm-6">
+        <?php echo Kohana::lang('app.copy_rights') ?>.
+    </div>
+    <div id="realization" class="col-sm-6">
+        <?php if (!empty($bHome) && $bHome === TRUE) : ?>
+            <?php echo Kohana::lang('app.realization') ?>
+        <?php else: ?>
+            <?php echo Kohana::lang('app.realization_subpages') ?>
+        <?php endif; ?>
+    </div>
+
+</div>

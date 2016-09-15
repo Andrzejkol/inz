@@ -1,0 +1,580 @@
+<?php
+
+class Contact_Form_Model extends Model_Core {
+
+    private $_rDb = null;
+
+    /**
+     *
+     */
+    public function __construct() {
+        parent::__construct();
+        $this->_rDb = new Database();
+    }
+
+    /**
+     * Dodanie nowego formularza kontaktowego
+     * @param array $aPost
+     * @return ErrorReporting 
+     */
+    public function Insert($aPost) {
+        try {
+            $aPagesIds = $aPost['page_id'];
+            if (!isset($aPost['show_title'])) {
+                $aPost['show_title'] = 'N';
+            }
+            unset($aPost['page_id'], $aPost['contact_form'], $aPost['add_contact_form'], $aPost['submit'], $aPost['submit_back']);
+            $result = $this->_rDb->insert(table::ELEMENTS, array('type' => 'contact_form', 'date_added' => TIME, 'lang' => $_POST['language'], 'available' => 1));
+            $iElementId = $result->insert_id();
+            $aPost['element_id'] = $iElementId;
+            $form_result = $this->_rDb->insert(table::CONTACT_FORMS, $aPost);
+            foreach ($aPagesIds as $iPageIdKey => $iPageIdValue) {
+                $this->_rDb->insert(table::PAGES_ELEMENTS, array('page_id' => $iPageIdValue, 'element_id' => $iElementId));
+            }
+            return new ErrorReporting(ErrorReporting::SUCCESS, $form_result, Kohana::lang('contact_form.insert_success'));
+        } catch (Exception $e) {
+            Kohana::log('error', $e->getMessage());
+            return new ErrorReporting(ErrorReporting::ERROR, null, Kohana::lang('contact_form.insert_error') . '<br />' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Aktualizacja formularza kontaktowego
+     * @param integer $iContactFormId
+     * @param array $aPost
+     * @return ErrorReporting
+     */
+    public function Update($iContactFormId, $aPost) {
+        try {
+            $iContactFormId += 0;
+            $oContactForm = $this->Find($iContactFormId)->Value[0];
+            $aPagesIds = $aPost['page_id'];
+            if (!isset($aPost['show_title'])) {
+                $aPost['show_title'] = 'N';
+            }
+            if (empty($aPost['has_captcha'])) {
+                $aPost['has_captcha'] = 'N';
+            }
+            unset($aPost['page_id'], $aPost['contact_form'], $aPost['add_contact_form'], $aPost['submit'], $aPost['submit_back']);
+            $this->_rDb->update(table::ELEMENTS, array('modified_date' => TIME), array('id_element' => $oContactForm->element_id, 'lang' => $_POST['language']));
+            $this->_rDb->update(table::CONTACT_FORMS, $aPost, array('id_contact_form' => $iContactFormId));
+            $this->_rDb->delete(table::PAGES_ELEMENTS, array('element_id' => $oContactForm->element_id));
+            foreach ($aPagesIds as $iPageIdKey => $iPageIdValue) {
+                $this->_rDb->insert(table::PAGES_ELEMENTS, array('page_id' => $iPageIdValue, 'element_id' => $oContactForm->element_id));
+            }
+            return new ErrorReporting(ErrorReporting::SUCCESS, true, Kohana::lang('contact_form.update_success'));
+        } catch (Exception $e) {
+            Kohana::log('error', $e->getMessage());
+            return new ErrorReporting(ErrorReporting::ERROR, false, Kohana::lang('contact_form.update_error') . '<br />' . $e->getMessage());
+        }
+    }
+
+    /**
+     * UsuniÄ™cie formularza kontaktowego
+     * @param integer $iContactFormId
+     * @return ErrorReporting
+     */
+    public function Delete($iContactFormId) {
+        try {
+            $iContactFormId += 0;
+            $oContactForm = $this->Find($iContactFormId)->Value[0];
+            $this->_rDb->delete(table::PAGES_ELEMENTS, array('element_id' => $oContactForm->element_id));
+            $this->_rDb->delete(table::ELEMENTS, array('id_element' => $oContactForm->element_id));
+            $result = $this->_rDb->delete(table::CONTACT_FORMS, array('id_contact_form' => $iContactFormId));
+            return new ErrorReporting(ErrorReporting::SUCCESS, $result, Kohana::lang('contact_form.delete_success'));
+        } catch (Exception $e) {
+            Kohana::log('error', $e->getMessage());
+            return new ErrorReporting(ErrorReporting::ERROR, null, Kohana::lang('contact_form.delete_error') . '<br />' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Zwraca formularz kontaktowy
+     * @param integer $iContactFormId
+     * @return ErrorReporting
+     */
+    public function Find($iContactFormId) {
+        try {
+            return new ErrorReporting(ErrorReporting::SUCCESS, $this->_rDb->getwhere(table::CONTACT_FORMS, array('id_contact_form' => $iContactFormId)), Kohana::lang('contact_form.find_success'));
+        } catch (Exception $e) {
+            Kohana::log('error', $e->getMessage());
+            return new ErrorReporting(ErrorReporting::ERROR, null, Kohana::lang('contact_form.find_error') . '<br />' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Zwraca wszystkie formularze lub część, gdy są ustawione limit i offset
+     * @param integer $limit
+     * @param integer $offset
+     */
+    public function FindAll($limit = null, $offset = null) {
+        try {
+
+            $contact_forms_orderby = 'title';
+            $kind = 'ASC';
+            if (!empty($_GET['contact_forms_orderby']) && $_GET['contact_forms_orderby'] == 1) {
+                $contact_forms_orderby = 'title';
+                $kind = 'ASC';
+            } else if (!empty($_GET['contact_forms_orderby']) && $_GET['contact_forms_orderby'] == 2) {
+                $contact_forms_orderby = 'title';
+                $kind = 'DESC';
+            } else if (!empty($_GET['contact_forms_orderby']) && $_GET['contact_forms_orderby'] == 3) {
+                $contact_forms_orderby = 'sender_email';
+                $kind = 'ASC';
+            } else if (!empty($_GET['contact_forms_orderby']) && $_GET['contact_forms_orderby'] == 4) {
+                $contact_forms_orderby = 'sender_email';
+                $kind = 'DESC';
+            } else if (!empty($_GET['contact_forms_orderby']) && $_GET['contact_forms_orderby'] == 5) {
+                $contact_forms_orderby = 'receiver_email';
+                $kind = 'ASC';
+            } else if (!empty($_GET['contact_forms_orderby']) && $_GET['contact_forms_orderby'] == 6) {
+                $contact_forms_orderby = 'receiver_email';
+                $kind = 'DESC';
+            }
+
+
+            if (!empty($limit) && isset($offset)) {
+                $this->_rDb->limit($limit, $offset);
+            }
+            return new ErrorReporting(ErrorReporting::SUCCESS, $this->_rDb->orderby($contact_forms_orderby, $kind)->get(table::CONTACT_FORMS), Kohana::lang('contact_form.find_all_success'));
+        } catch (Exception $e) {
+            Kohana::log('error', $e->getMessage());
+            return new ErrorReporting(ErrorReporting::ERROR, null, Kohana::lang('contact_form.find_all_error') . '<br />' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Zwraca liczbę formularzy kontaktowych
+     * @return ErrorReporting 
+     */
+    public function Count() {
+        try {
+            return new ErrorReporting(ErrorReporting::SUCCESS, $this->_rDb->count_records(table::CONTACT_FORMS), Kohana::lang('contact_form.find_success'));
+        } catch (Exception $e) {
+            Kohana::log('error', $e->getMessage());
+            return new ErrorReporting(ErrorReporting::ERROR, null, Kohana::lang('contact_form.find_error') . '<br />' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Zwraca logi z form kontaktowych sortowane wg daty malejąco.
+     * Jeśli podane parametry, to zwraca część logów.
+     * @param int $limit
+     * @param int $offset
+     */
+    public function GetAllLogs($limit = null, $offset = null) {
+        try {
+            $this->_rDb->from(table::CONTACT_FORMS_LOG)
+                    ->orderby('date_sent', 'DESC');
+            if (!empty($limit) && isset($offset)) {
+                $this->_rDb->limit($limit, $offset);
+            }
+            $result = $this->_rDb->get();
+            if (!empty($result) && $result->count() > 0) {
+                return new ErrorReporting(ErrorReporting::SUCCESS, $result);
+            } else {
+                return new ErrorReporting(ErrorReporting::INFO, false, Kohana::lang('contact_form.log_table_empty'));
+            }
+        } catch (Exception $e) {
+            Kohana::log('error', $e->getFile() . $e->getLine() . $e->getMessage());
+            return new ErrorReporting(ErrorReporting::ERROR, false, Kohana::lang('contact_form.log_find_error'));
+        }
+    }
+
+    /**
+     * Zwraca wyrenderowaną listę z błędami
+     * 
+     * @param array $aPost
+     * @return ErrorReporting 
+     */
+    public function ValidateContactFormAdd(array $aPost) {
+        try {
+            if (!empty($aPost)) {
+                $alert = '';
+                if (empty($aPost['title'])) {
+                    $alert .= '<li>' . Kohana::lang('contact_form.error_title_empty') . '</li>';
+                }
+                if (empty($aPost['page_id'])) {
+                    $alert .= '<li>' . Kohana::lang('contact_form.error_page_id_empty') . '</li>';
+                }
+                if (empty($aPost['sender_email'])) {
+                    $alert .= '<li>' . Kohana::lang('contact_form.error_sender_email_empty') . '</li>';
+                } else if (!empty($aPost['sender_email'])) {
+                    if (!$this->ValidateMail($aPost['sender_email'])) {
+                        $alert .= '<li>' . Kohana::lang('contact_form.error_sender_email_format') . '</li>';
+                    }
+                }
+                if (empty($aPost['receiver_email'])) {
+                    $alert .= '<li>' . Kohana::lang('contact_form.error_receiver_email_empty') . '</li>';
+                } else if (!empty($aPost['receiver_email'])) {
+                    $aEmails = explode(',', $aPost['receiver_email']);
+                    foreach ($aEmails as $email) {
+                        $email = trim($email);
+                        if (!empty($email)) {
+                            if (!$this->ValidateMail($email)) {
+                                $alert .= '<li>' . Kohana::lang('contact_form.error_receiver_email_format') . '</li>';
+                                break 1;
+                            }
+                        }
+                    }
+                }
+                if (!empty($alert)) {
+                    $alert = Kohana::lang('contact_form.following_errors') . ': <ul>' . $alert . '</ul>';
+                    return new ErrorReporting(ErrorReporting::ERROR, false, $alert);
+                } else {
+                    return new ErrorReporting(ErrorReporting::SUCCESS, true, Kohana::lang('contact_form.validate_add_success'));
+                }
+            }
+        } catch (Exception $e) {
+            Kohana::log('error', $e->getMessage());
+            return new ErrorReporting(ErrorReporting::ERROR, false, Kohana::lang('contact_form.validate_add_error') . '<br />' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Zwraca wyrenderowaną listę z błędami
+     * 
+     * @param integer $iContactFormId
+     * @param array $aPost
+     * @return ErrorReporting
+     */
+    public function ValidateContactFormEdit($iContactFormId, array $aPost) {
+        try {
+            if (!empty($aPost)) {
+                $alert = '';
+                if (empty($aPost['title'])) {
+                    $alert .= '<li>' . Kohana::lang('contact_form.error_title_empty') . '</li>';
+                }
+                if (empty($aPost['page_id'])) {
+                    $alert .= '<li>' . Kohana::lang('contact_form.error_page_id_empty') . '</li>';
+                }
+                if (empty($aPost['sender_email'])) {
+                    $alert .= '<li>' . Kohana::lang('contact_form.error_sender_email_empty') . '</li>';
+                } else if (!empty($aPost['sender_email'])) {
+                    if (!$this->ValidateMail($aPost['sender_email'])) {
+                        $alert .= '<li>' . Kohana::lang('contact_form.error_sender_email_format') . '</li>';
+                    }
+                }
+                if (empty($aPost['receiver_email'])) {
+                    $alert .= '<li>' . Kohana::lang('contact_form.error_receiver_email_empty') . '</li>';
+                } else if (!empty($aPost['receiver_email'])) {
+                    $aEmails = explode(',', $aPost['receiver_email']);
+                    foreach ($aEmails as $email) {
+                        $email = trim($email);
+                        if (!empty($email)) {
+                            if (!$this->ValidateMail($email)) {
+                                $alert .= '<li>' . Kohana::lang('contact_form.error_receiver_email_format') . '</li>';
+                                break 1;
+                            }
+                        }
+                    }
+                }
+                if (!empty($alert)) {
+                    $alert = Kohana::lang('contact_form.following_errors') . ': <ul>' . $alert . '</ul>';
+                    return new ErrorReporting(ErrorReporting::ERROR, false, $alert);
+                } else {
+                    return new ErrorReporting(ErrorReporting::SUCCESS, true, Kohana::lang('contact_form.validate_edit_success'));
+                }
+            }
+            return new ErrorReporting(ErrorReporting::SUCCESS, true, Kohana::lang('contact_form.validate_edit_success'));
+        } catch (Exception $e) {
+            Kohana::log('error', $e->getMessage());
+            return new ErrorReporting(ErrorReporting::ERROR, false, Kohana::lang('contact_form.validate_edit_error') . '<br />' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Zwraca widok formy
+     * 
+     * @param int $iElementId
+     * @return ErrorReporting 
+     */
+    public function GetContactFormByElementId($iElementId) {
+        $v = new View('app_contact_form');
+        $v->iElementId = ($iElementId+=0);
+        return new ErrorReporting(ErrorReporting::SUCCESS, $v);
+    }
+
+    /**
+     * Zwraca formularz kontaktowy na podstawie elementu strony
+     * 
+     * @param integer $iElementId
+     * @return ErrorReporting 
+     */
+    public function FindByElementId($iElementId) {
+        try {
+            return new ErrorReporting(ErrorReporting::SUCCESS, $this->_rDb->getwhere(table::CONTACT_FORMS, array('element_id' => $iElementId)));
+        } catch (Exception $e) {
+            Kohana::log('error', $ex->getMessage());
+            return new ErrorReporting(ErrorReporting::ERROR, false);
+        }
+    }
+
+    /**
+     * Wysyła wiadomość z formularza kontaktowego
+     * 
+     * @param type $aPost
+     * @return ErrorReporting 
+     */
+    public function SendMessage($aPost) {
+        try {
+            $config = Kohana::config('email');
+            $contactFormDetails = $this->FindByElementId($aPost['element_id'])->Value;
+            if (!empty($aPost['email'])) {
+                $from = $aPost['email'];
+            } else if (!empty($contactFormDetails[0]->sender_email)) {
+                $from = $contactFormDetails[0]->sender_email;
+            } else {
+                throw new Exception('NO EMAIL');
+            }
+            $recipients = array_map('trim', explode(',', $contactFormDetails[0]->receiver_email));
+            $vBody = new View('emails/default_email_template');
+
+            $vBody->sContent = '<strong>Imię i nazwisko/nazwa firmy:</strong> ' . $aPost['name'] . '<br />';
+            $vBody->sContent .= '<strong>Telefon kontaktowy:</strong> ' . $aPost['phone'] . '<br />';
+            $vBody->sContent .= '<strong>Email:</strong> ' . $aPost['email'] . '<br />';
+            $vBody->sContent .= '<strong>Wiadomość:</strong><br />' . $aPost['message'];
+            $sSubject = (!empty($aPost['topic']) ? ($aPost['topic'] . ' - ') : '') . 'Wiadomość wysłana ze strony ' . Kohana::lang('meta.home_site_title');
+            $attachments = null;
+            // $attachments=array('file'=>$config['logo']);
+            $result = layer::SendMessage($sSubject, $vBody, $recipients, 'noreply@comm-hotel.pl', $attachments)->Value;
+            if ($result) {
+                unset($aPost['contact_form_submit'], $aPost['element_id']);
+                $aPost['ip_address'] = $_SERVER['REMOTE_ADDR'];
+                $aPost['date_sent'] = time();
+                $this->_rDb->insert(table::CONTACT_FORMS_LOG, $aPost);
+                return new ErrorReporting(ErrorReporting::SUCCESS, true, Kohana::lang('contact_form.success_send_message'));
+            } else {
+                return new ErrorReporting(ErrorReporting::ERROR, false, Kohana::lang('contact_form.error_send_message'));
+            }
+        } catch (Exception $e) {
+            Kohana::log('error', $e->getMessage());
+            return new ErrorReporting(ErrorReporting::ERROR, false, Kohana::lang('contact_form.cant_send_form'));
+        }
+    }
+
+    public function SendReservation($aPost) {
+        try {
+            $config = Kohana::config('email');
+            $contactFormDetails = $this->FindByElementId($aPost['element_id'])->Value;
+            if (!empty($aPost['r_email'])) {
+                $from = $aPost['r_email'];
+            } else if (!empty($contactFormDetails[0]->sender_email)) {
+                $from = $contactFormDetails[0]->sender_email;
+            } else {
+                throw new Exception('NO EMAIL');
+            }
+            $recipients = array_map('trim', explode(',', $contactFormDetails[0]->receiver_email));
+            $vBody = new View('emails/default_email_template');
+
+            $vBody->sContent = '<strong>Data od: </strong> ' . $aPost['r_from'] . '<br />';
+            $vBody->sContent .= '<strong>Data do: </strong> ' . $aPost['r_to'] . '<br />';
+            $vBody->sContent .= '<strong>Ilość pokoi: </strong> ' . $aPost['r_rooms'] . '<br />';
+
+            $type = "Standard";
+            for ($i = 0; $i < count($aPost['r_person_count']); $i++) {
+
+                switch ($aPost['r_room_type'][$i]) {
+                    case 1: {
+                            $type = 'Standard';
+                            break;
+                        }
+                    case 2: {
+                            $type = 'VIP';
+                            break;
+                        }
+                    case 3: {
+                            $type = 'z jacuzzi';
+                            break;
+                        }
+                }
+                $vBody->sContent .= '<strong>Osób w pokoju ' . ($i + 1) . ': </strong> ' . $aPost['r_person_count'][$i] . '<br />';
+                $vBody->sContent .= '<strong>Typ pokoju ' . ($i + 1) . ': </strong> ' . $type . '<br />';
+            }
+            $vBody->sContent .= '<strong>Uwagi:</strong><br />' . $aPost['r_message'] . '<br />';
+
+            $vBody->sContent .= '<strong>Imię i nazwisko:</strong> ' . $aPost['r_name'] . ' ' . $aPost['r_surname'] . '<br />';
+            $vBody->sContent .= '<strong>Telefon kontaktowy:</strong> ' . $aPost['r_phone'] . '<br />';
+            $vBody->sContent .= '<strong>Email:</strong> ' . $aPost['r_email'] . '<br />';
+            $sSubject = Kohana::lang('contact_form.r_subject');
+            $attachments = null;
+            // $attachments=array('file'=>$config['logo']);
+           $result = layer::SendMessage($sSubject, $vBody, $recipients, 'noreply@comm-hotel.pl', $attachments)->Value;
+            $vBody->sContent = Kohana::lang('contact_form.r_client_info') . '<br />';
+            $vBody->sContent .= '<strong>Imię i nazwisko:</strong> ' . $aPost['r_name'] . ' ' . $aPost['r_surname'] . '<br />';
+            $vBody->sContent .= '<strong>Telefon kontaktowy:</strong> ' . $aPost['r_phone'] . '<br />';
+            $vBody->sContent .= '<strong>Email:</strong> ' . $aPost['r_email'] . '<br />';
+            $vBody->sContent .= '<strong>Data od: </strong> ' . $aPost['r_from'] . '<br />';
+            $vBody->sContent .= '<strong>Data do: </strong> ' . $aPost['r_to'] . '<br />';
+            $vBody->sContent .= '<strong>Ilość pokoi: </strong> ' . $aPost['r_rooms'] . '<br />';
+            for ($i = 0; $i < count($aPost['r_person_count']); $i++) {
+
+                switch ($aPost['r_room_type'][$i]) {
+                    case 1: {
+                            $type = 'Standard';
+                            break;
+                        }
+                    case 2: {
+                            $type = 'VIP';
+                            break;
+                        }
+                    case 3: {
+                            $type = 'Jacuzzi';
+                            break;
+                        }
+                }
+                $vBody->sContent .= '<strong>Osób w pokoju ' . ($i + 1) . ': </strong> ' . $aPost['r_person_count'][$i] . '<br />';
+                $vBody->sContent .= '<strong>Typ pokoju ' . ($i + 1) . ': </strong> ' . $type . '<br />';
+            }
+            $vBody->sContent .= '<strong>Uwagi:</strong><br />' . $aPost['r_message'];
+
+            $recipients = array_map('trim', explode(',', $aPost['r_email']));
+           $result = layer::SendMessage($sSubject, $vBody, $recipients, 'noreply@comm-hotel.pl', $attachments)->Value;
+            if ($result) {
+                unset($aPost['r_form_submit'], $aPost['element_id']);
+                return new ErrorReporting(ErrorReporting::SUCCESS, true, Kohana::lang('contact_form.r_success_send_message'));
+            } else {
+                return new ErrorReporting(ErrorReporting::ERROR, false, Kohana::lang('contact_form.r_error_send_message'));
+            }
+        } catch (Exception $e) {
+            Kohana::log('error', $e->getMessage());
+            return new ErrorReporting(ErrorReporting::ERROR, false, Kohana::lang('contact_form.r_cant_send_form'));
+        }
+    }
+
+    /**
+     * Sprawdza i zwraca wyrenderowaną listę błędów
+     * 
+     * @return ErrorReporting 
+     */
+    public function ValidateSend() {
+        // pobieramy dane dla formularza
+        $oFrom = $this->_rDb->from(table::CONTACT_FORMS)
+                ->where(array('element_id' => $_POST['element_id']))
+                ->get();
+        $alert = '';
+        if (empty($_POST['name'])) {
+            $alert .= '<li>' . Kohana::lang('contact_form.error_name_empty') . '</li>';
+        }
+        if (empty($_POST['phone'])) {
+            $alert .= '<li>' . Kohana::lang('contact_form.error_phone_empty') . '</li>';
+        }
+        if (empty($_POST['email'])) {
+            $alert .= '<li>' . Kohana::lang('contact_form.error_email_empty') . '</li>';
+        } else if (!empty($_POST['email'])) {
+            if (!$this->ValidateMail($_POST['email'])) {
+                $alert .= '<li>' . Kohana::lang('contact_form.error_email_format') . '</li>';
+            }
+        }
+        if (empty($_POST['message'])) {
+            $alert .= '<li>' . Kohana::lang('contact_form.error_message_empty') . '</li>';
+        }
+        if (!empty($oFrom) && !empty($oFrom[0]->has_captcha) && $oFrom[0]->has_captcha == 'Y') {
+            if (empty($_POST['captcha_code'])) {
+                $alert .= '<li>' . Kohana::lang('contact_form.error_captcha_code_empty') . '</li>';
+            } else {
+                if (!Captcha::valid($_POST['captcha_code'])) {
+                    $alert .= '<li>' . Kohana::lang('contact_form.error_captcha_response') . '</li>';
+                }
+            }
+        }
+        if (!empty($alert)) {
+            $alert = Kohana::lang('contact_form.following_errors') . ': <ul>' . $alert . '</ul>';
+            return new ErrorReporting(ErrorReporting::ERROR, false, $alert);
+        } else {
+            return new ErrorReporting(ErrorReporting::SUCCESS, true, '');
+        }
+    }
+
+    public function ValidateSendReservation() {
+        $alert = '';
+        if (empty($_POST['r_name'])) {
+            $alert .= '<li>' . Kohana::lang('contact_form.error_name_empty') . '</li>';
+        }
+        if (empty($_POST['r_surname'])) {
+            $alert .= '<li>' . Kohana::lang('contact_form.error_name_empty') . '</li>';
+        }
+        if (empty($_POST['r_email'])) {
+            $alert .= '<li>' . Kohana::lang('contact_form.error_email_empty') . '</li>';
+        } else if (!empty($_POST['r_email'])) {
+            if (!$this->ValidateMail($_POST['r_email'])) {
+                $alert .= '<li>' . Kohana::lang('contact_form.error_email_format') . '</li>';
+            }
+        }
+        if (empty($_POST['r_message'])) {
+            $alert .= '<li>' . Kohana::lang('contact_form.error_message_empty') . '</li>';
+        }
+
+        if (!empty($alert)) {
+            $alert = Kohana::lang('contact_form.following_errors') . ': <ul>' . $alert . '</ul>';
+            return new ErrorReporting(ErrorReporting::ERROR, false, $alert);
+        } else {
+            return new ErrorReporting(ErrorReporting::SUCCESS, true, '');
+        }
+    }
+
+    /**
+     * Walidacja maila
+     * 
+     * @param type $email
+     * @return type 
+     */
+    public function ValidateMail($email) {
+        if (!preg_match('/^[^@]{1,64}@[^@]{1,255}$/', $email)) {
+            // Email invalid because wrong number of characters in one section, or wrong number of @ symbols.
+            return false;
+        }
+        // Split it into sections to make life easier
+        $email_array = explode("@", $email);
+        $local_array = explode(".", $email_array[0]);
+        for ($i = 0; $i < sizeof($local_array); $i++) {
+            if (!preg_match('/^(([A-Za-z0-9!#$%&\'*+\/=?^_`{|}~-][A-Za-z0-9!#$%&\'*+\/=?^_`{|}~\.-]{0,63})|(\"[^(\\|\")]{0,62}\"))$/', $local_array[$i])) {
+                return false;
+            }
+        }
+        if (!preg_match('/^\[?[0-9\.]+\]?$/', $email_array[1])) { // Check if domain is IP. If not, it should be valid domain name
+            $domain_array = explode(".", $email_array[1]);
+            if (sizeof($domain_array) < 2) {
+                return false; // Not enough parts to domain
+            }
+            for ($i = 0; $i < sizeof($domain_array); $i++) {
+                if (!preg_match('/^(([A-Za-z0-9][A-Za-z0-9-]{0,61}[A-Za-z0-9])|([A-Za-z0-9]+))$/', $domain_array[$i])) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Usuwa formy kontaktowe wg $elementId
+     * 
+     * @param int $elementId
+     * @return ErrorReporting 
+     */
+    public function DeleteContactFormByElementId($elementId) {
+        try {
+            $this->db->query('SET AUTOCOMMIT = 0');
+            $this->db->query('BEGIN');
+            $elementId+=0;
+
+            $gallery = $this->db->from(table::CONTACT_FORMS)->where(array('element_id' => $elementId))->get();
+
+            //usuwamy wszystkie
+            foreach ($contact_form as $cf) {
+                if ($this->Delete($cf->id_contact_form)->Type === ErrorReporting::ERROR) {
+                    throw new Exception();
+                }
+            }
+
+            $this->db->query('COMMIT');
+            return new ErrorReporting(ErrorReporting::SUCCESS, true, Kohana::lang('contact_form.success_delete_contact_form'));
+        } catch (Exception $ex) {
+            $this->db->query('ROLLBACK');
+            //var_dump($ex->getMessage());
+            Kohana::log('error', __FILE__ . __LINE__ . $ex->getMessage());
+            return new ErrorReporting(ErrorReporting::ERROR, false, Kohana::lang('contact_form.error_delete_contact_form'));
+        }
+    }
+
+}

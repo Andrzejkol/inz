@@ -1,0 +1,5 @@
+body { background-image:url(../../img/errors/body_bg.gif); background-repeat:repeat-x; background-color:#F3F3F3;  margin:0px; padding:0px; font-style:Tahoma,Verdana,Arial,Helvetica,sans-serif; color:#333333; font-size:12px; text-align:center; min-height:500px;}
+#content { margin:0px auto; width:980px; text-align:center; margin-top:40px; }
+#logo { background-image:url(../../img/oli_new.png); background-repeat: no-repeat; width:270px; height:115px; margin-left:20px;}
+#info { margin-top:170px; font-size:34px; font-family:Georgia; height:200px; }
+#footer a { border-bottom:1px dashed #A1A1A1; color:#444444; text-decoration:none; }

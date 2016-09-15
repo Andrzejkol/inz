@@ -1,0 +1,15 @@
+/* Site rules */
+body {
+   background-color: #000;
+   font-family: Tahoma, Verdana, Helvetica, sans-serif;
+   font-size: medium;
+}
+
+/* TinyMCE specific rules */
+body.mceContentBody {
+   background: #fff;
+}
+
+.mceContentBody a {
+   color: red !important; /* FF requires a important here */
+}

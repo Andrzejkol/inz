@@ -1,0 +1,14 @@
+
+
+
+
+#header .slider {background:url(../../img/easy/sliderbg.jpg) center center no-repeat; background-size:cover;}
+
+#product-content .product-spec-wrapper {padding:0px 30px;}
+#product-content h5 {color:#fb2560; font-size:16px; margin:0px 0px 5px 0px; font-weight:bold;}
+#product-content .spec-group {margin-bottom:5px; margin-top:15px; }
+#product-content .spec-group .spec-row {display:inline-block; width:100%; font-size:14px;}
+#product-content .spec-group .spec-row .spec-name {width:35%; float:left;}
+#product-content .spec-group .spec-row .spec-val {width:65%; float:left;}
+
+

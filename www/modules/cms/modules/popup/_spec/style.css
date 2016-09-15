@@ -1,0 +1,14 @@
+
+.popup-element {transition: 0.5s all ease-in-out; position:fixed; left:0; right:0; bottom:0; top:0px; margin:auto;z-index: 101; background:rgba(0,0,0,0.5);}
+.popup-element .popup-wrapper{background-color:white; margin: auto;width:770px; height:300px; display:inline-block; position: absolute; top: 50%; left: 0px; right: 0px; transform: translateY(-50%);}
+.popup-element .popup-wrapper .popup-close {position:absolute;z-index:100; cursor:pointer; top:10px; right:10px; background:url(../../img/popup-close.jpg) center center no-repeat; width:12px; height:12px;}
+.popup-element .popup-wrapper .popup-photo {float:left;width:50%;}
+.popup-element .popup-wrapper .popup-text {padding-left:20px; padding-right: 20px; width:50%; position:relative; min-height: 300px;float: right; padding-top: 130px; }
+.popup-element .popup-wrapper h2 { text-align:right; text-shadow: none;font-family: 'Sarpanch', sans-serif; font-size:30px; background-color:white; padding:15px; position:absolute; top:20px;right:15px; font-weight: bold; text-transform:uppercase; margin-bottom:35px;}
+.popup-element .popup-wrapper a {right: 15px;bottom: 5px; position: absolute;float:right; transition: all 0.5s ease-in-out; display:inline-block; margin: 10px auto;border-radius: 0px; text-align: center;text-transform: uppercase; font-size: 14px;font-weight: 400; padding: 5px 15px; border: 1px solid #484848;}
+.popup-element .popup-button {transition: 0.5s all ease-in-out; color:white; padding:15px; background-color:#EA7F00; position:absolute;right:-26px; top: 250px; transform: translateX(50%) rotate(-90deg);display:block; white-space: nowrap; text-transform: uppercase; font-weight: bold;}
+.popup-element.popup-hide .popup-button {}
+.popup-element.popup-hide .popup-wrapper {background:none; display:none;}
+.popup-element.popup-hide { background:none; position:fixed; right: 0px;top: 0px; left: initial;width: 55px; width:initial; height: 100%; bottom: initial; z-index: 102; display: block;}
+.popup-element.popup-hide .popup-wrapper {top:0px; transform: none;}
+body{overflow-x: hidden;}
